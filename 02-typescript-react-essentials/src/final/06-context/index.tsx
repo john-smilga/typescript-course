@@ -1,4 +1,14 @@
-import { useTheme } from './context';
+import { useTheme, ThemeProvider } from './context';
+
+function ParentComponent() {
+  return (
+    <ThemeProvider>
+      <Component />
+    </ThemeProvider>
+  );
+  return <Component />;
+}
+
 function Component() {
   const context = useTheme();
   console.log(context);
@@ -21,4 +31,4 @@ function Component() {
     </div>
   );
 }
-export default Component;
+export default ParentComponent;

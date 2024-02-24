@@ -13,8 +13,6 @@ This GitHub project provides a comprehensive guide to integrating TypeScript wit
 
 Each section is presented with relevant code snippets and explanations, making it an ideal resource for developers looking to deepen their understanding of TypeScript in React applications.
 
-
-
 ## Setup
 
 ```sh
@@ -333,7 +331,35 @@ function Component() {
 export default Component;
 ```
 
-## 05 - Complex Setup
+The FormData API is a web technology that allows developers to easily construct and manage sets of key/value pairs representing form fields and their values. It is commonly used to send form data, including files, from a client (such as a web browser) to a server in a format that can be easily processed. The FormData API provides a way to programmatically create and manipulate form data, making it useful for AJAX requests and handling file uploads in web applications.
+
+## 05 - Challenge - Profile Card
+
+- initial approach
+
+```tsx
+type ProfileCardProps = {
+  type: 'basic' | 'advanced';
+  name: string;
+  email?: string;
+};
+
+function Component(props: ProfileCardProps) {
+  const { type, name, email } = props;
+
+  const alertType = type === 'basic' ? 'success' : 'danger';
+  const className = `alert alert-${alertType}`;
+  return (
+    <article className={className}>
+      <h2>user : {name}</h2>
+      {email && <h2>email : {props.email}</h2>}
+    </article>
+  );
+}
+export default Component;
+```
+
+- final approach
 
 ```tsx
 type BasicProfileCardProps = {
@@ -341,25 +367,25 @@ type BasicProfileCardProps = {
   name: string;
 };
 
-type DetailedProfileCardProps = {
-  type: 'detailed';
+type AdvancedProfileCardProps = {
+  type: 'advanced';
   name: string;
   email: string;
 };
-type ProfileCardProps = BasicProfileCardProps | DetailedProfileCardProps;
+type ProfileCardProps = BasicProfileCardProps | AdvancedProfileCardProps;
 function Component(props: ProfileCardProps) {
   const { type, name } = props;
   if (type === 'basic')
     return (
-      <article>
-        <h2>{name}</h2>
+      <article className='alert alert-success'>
+        <h2>user : {name}</h2>
       </article>
     );
 
   return (
-    <article>
-      <h2>{name}</h2>
-      <h2>{props.email}</h2>
+    <article className='alert alert-danger'>
+      <h2>user : {name}</h2>
+      <h2>email : {props.email}</h2>
     </article>
   );
 }
@@ -367,6 +393,60 @@ export default Component;
 ```
 
 ## 06 - Context
+
+- basic context
+
+```tsx
+import { createContext, useContext } from 'react';
+
+const ThemeProviderContext = createContext<{ name: string } | undefined>(
+  undefined
+);
+
+export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  return (
+    <ThemeProviderContext.Provider value={{ name: 'susan' }}>
+      {children}
+    </ThemeProviderContext.Provider>
+  );
+}
+
+export const useTheme = () => {
+  const context = useContext(ThemeProviderContext);
+
+  if (context === undefined)
+    throw new Error('useTheme must be used within a ThemeProvider');
+
+  return context;
+};
+```
+
+basic-index.tsx
+
+```tsx
+import { useTheme, ThemeProvider } from './basic-context';
+
+function ParentComponent() {
+  return (
+    <ThemeProvider>
+      <Component />
+    </ThemeProvider>
+  );
+  return <Component />;
+}
+
+function Component() {
+  const context = useTheme();
+  console.log(context);
+
+  return (
+    <div>
+      <h2>random component</h2>
+    </div>
+  );
+}
+export default ParentComponent;
+```
 
 context.tsx
 
@@ -414,7 +494,17 @@ export const useTheme = () => {
 Component.tsx
 
 ```tsx
-import { useTheme } from './context';
+import { useTheme, ThemeProvider } from './context';
+
+function ParentComponent() {
+  return (
+    <ThemeProvider>
+      <Component />
+    </ThemeProvider>
+  );
+  return <Component />;
+}
+
 function Component() {
   const context = useTheme();
   console.log(context);
@@ -437,25 +527,7 @@ function Component() {
     </div>
   );
 }
-export default Component;
-```
-
-App.tsx
-
-```tsx
-import Component from './final/06-context';
-import { ThemeProvider } from './final/06-context/context';
-function App() {
-  return (
-    <ThemeProvider>
-      <main>
-        <Component />
-      </main>
-    </ThemeProvider>
-  );
-}
-
-export default App;
+export default ParentComponent;
 ```
 
 ## 07 - Reducers
