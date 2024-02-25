@@ -320,6 +320,7 @@ function Component() {
           className='form-input mb-1'
           value={email}
           onChange={handleChange}
+          name='email'
         />
         <button type='submit' className='btn btn-block'>
           submit
