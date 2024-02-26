@@ -336,7 +336,7 @@ The FormData API is a web technology that allows developers to easily construct 
 
 ## 05 - Challenge - Profile Card
 
-- initial approach
+- initial approach (won't work as expected)
 
 ```tsx
 type ProfileCardProps = {
@@ -353,7 +353,31 @@ function Component(props: ProfileCardProps) {
   return (
     <article className={className}>
       <h2>user : {name}</h2>
-      {email && <h2>email : {props.email}</h2>}
+      {email && <h2>email : {email}</h2>}
+    </article>
+  );
+}
+export default Component;
+```
+
+- another approach (won't work as expected)
+
+```tsx
+type ProfileCardProps = {
+  type: 'basic' | 'advanced';
+  name: string;
+  email?: string;
+};
+
+function Component(props: ProfileCardProps) {
+  const { type, name, email } = props;
+
+  const alertType = type === 'basic' ? 'success' : 'danger';
+  const className = `alert alert-${alertType}`;
+  return (
+    <article className={className}>
+      <h2>user : {name}</h2>
+      {type === advanced ? <h2>email : {email}</h2> : null}
     </article>
   );
 }
@@ -698,7 +722,10 @@ export const counterReducer = (
     case 'setStatus':
       return { ...state, status: action.payload };
     default:
-      return state;
+      const unhandledActionType: never = action;
+      throw new Error(
+        `Unexpected action type: ${unhandledActionType}. Please double check the counter reducer.`
+      );
   }
 };
 ```
@@ -755,35 +782,16 @@ export default Component;
 
 ```sh
 npm i zod axios @tanstack/react-query
+
 ```
-
-type.ts
-
-```ts
-import { z } from 'zod';
-
-export const tourSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  image: z.string(),
-  info: z.string(),
-  price: z.string(),
-  // someValue: z.string(),
-});
-
-export type Tour = z.infer<typeof tourSchema>;
-```
-
-index-fetch.tsx
 
 ```tsx
 import { useState, useEffect } from 'react';
-import { type Tour, tourSchema } from './types';
 const url = 'https://www.course-api.com/react-tours-project';
 
 function Component() {
-  const [tours, setTours] = useState<Tour[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  // tours
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isError, setIsError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -795,13 +803,8 @@ function Component() {
           throw new Error(`Failed to fetch tours...`);
         }
 
-        const rawData: Tour[] = await response.json();
-        const result = tourSchema.array().safeParse(rawData);
-        if (!result.success) {
-          console.log(result.error.message);
-          throw new Error(`Failed to parse tours...`);
-        }
-        setTours(result.data);
+        const rawData = await response.json();
+        console.log(rawData);
       } catch (error) {
         const message =
           error instanceof Error ? error.message : 'there was an error...';
@@ -825,6 +828,78 @@ function Component() {
   return (
     <div>
       <h2 className='mb-1'>Tours</h2>
+    </div>
+  );
+}
+export default Component;
+```
+
+types.ts
+
+```ts
+import { z } from 'zod';
+
+export const tourSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  image: z.string(),
+  info: z.string(),
+  price: z.string(),
+  // someValue: z.string(),
+});
+
+export type Tour = z.infer<typeof tourSchema>;
+```
+
+index-fetch.tsx
+
+```tsx
+import { useState, useEffect } from 'react';
+const url = 'https://www.course-api.com/react-tours-project';
+import { type Tour, tourSchema } from './types';
+function Component() {
+  // tours
+  const [tours, setTours] = useState<Tour[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch tours...`);
+        }
+        const rawData: Tour[] = await response.json();
+        const result = tourSchema.array().safeParse(rawData);
+
+        if (!result.success) {
+          console.log(result.error.message);
+          throw new Error(`Failed to parse tours`);
+        }
+        setTours(result.data);
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : 'there was an error...';
+        setIsError(message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  if (isLoading) {
+    return <h3>Loading...</h3>;
+  }
+  if (isError) {
+    return <h3>Error {isError}</h3>;
+  }
+
+  return (
+    <div>
+      <h2 className='mb-1'>Tours</h2>
       {tours.map((tour) => {
         return (
           <p key={tour.id} className='mb-1'>
@@ -839,6 +914,34 @@ export default Component;
 ```
 
 - React Query
+
+types.ts
+
+```ts
+import { z } from 'zod';
+import axios from 'axios';
+const url = 'https://course-api.com/react-tours-project';
+
+export const tourSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  image: z.string(),
+  info: z.string(),
+  price: z.string(),
+  // someValue: z.string(),
+});
+
+export type Tour = z.infer<typeof tourSchema>;
+
+export const fetchTours = async (): Promise<Tour[]> => {
+  const response = await axios.get<Tour[]>(url);
+  const result = tourSchema.array().safeParse(response.data);
+  if (!result.success) {
+    throw new Error('Parsing failed');
+  }
+  return result.data;
+};
+```
 
 main.tsx
 
@@ -861,27 +964,28 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 index.tsx
 
 ```tsx
-import { fetchTours } from './utils';
+import { fetchTours } from './types';
 import { useQuery } from '@tanstack/react-query';
+
 function Component() {
   const {
-    data: tours,
     isPending,
     isError,
     error,
+    data: tours,
   } = useQuery({
     queryKey: ['tours'],
     queryFn: fetchTours,
   });
 
-  if (isPending) return <h3>Loading...</h3>;
-  if (isError) return <h3>Error: {error.message}</h3>;
+  if (isPending) return <h2>Loading...</h2>;
+  if (isError) return <h2>Error : {error.message} </h2>;
   return (
     <div>
-      <h2 className='mb-1'>Tours</h2>
-      {tours?.map((tour) => {
+      <h2 className='mb-1'>Tours </h2>
+      {tours.map((tour) => {
         return (
-          <p key={tour.id} className='mb-1'>
+          <p className='mb-1' key={tour.id}>
             {tour.name}
           </p>
         );
@@ -889,24 +993,8 @@ function Component() {
     </div>
   );
 }
+
 export default Component;
-```
-
-utils.ts
-
-```ts
-import axios from 'axios';
-import { tourSchema, type Tour } from './types';
-const url = 'https://course-api.com/react-tours-project';
-
-export const fetchTours = async (): Promise<Tour[]> => {
-  const response = await axios.get<Tour[]>(url);
-  const result = tourSchema.array().safeParse(response.data);
-  if (!result.success) {
-    throw new Error('Parsing failed');
-  }
-  return result.data;
-};
 ```
 
 ## 09 - RTK
