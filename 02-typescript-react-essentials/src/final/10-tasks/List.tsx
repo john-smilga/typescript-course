@@ -5,7 +5,7 @@ type ListProps = {
   toggleTask: ({ id }: { id: string }) => void;
 };
 
-const List = ({ tasks, toggleTask }: ListProps) => {
+function List({ tasks, toggleTask }: ListProps) {
   return (
     <ul className='list'>
       {tasks.map((task) => {
@@ -24,5 +24,5 @@ const List = ({ tasks, toggleTask }: ListProps) => {
       })}
     </ul>
   );
-};
+}
 export default List;

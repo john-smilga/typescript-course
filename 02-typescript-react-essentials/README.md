@@ -1166,6 +1166,8 @@ export default Component;
 
 ## 10 - Tasks
 
+- create Form, List components
+
 types.ts
 
 ```ts
@@ -1184,40 +1186,75 @@ import Form from './Form';
 import List from './List';
 import { type Task } from './types';
 
-// Load tasks from localStorage
-function loadTasks(): Task[] {
-  const storedTasks = localStorage.getItem('tasks');
-  return storedTasks ? JSON.parse(storedTasks) : [];
-}
+function Component() {
+  const [tasks, setTasks] = useState<Task[]>([]);
 
-function updateStorage(tasks: Task[]): void {
-  localStorage.setItem('tasks', JSON.stringify(tasks));
+  return (
+    <section>
+      <Form />
+      <List />
+    </section>
+  );
 }
+export default Component;
+```
+
+Form.tsx
+
+```tsx
+import { useState } from 'react';
+import { type Task } from './types';
+
+function Form() {
+  const [text, setText] = useState('');
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!text) {
+      alert('please enter a task');
+      return;
+    }
+    //  add task
+    setText('');
+  };
+  return (
+    <form className='form task-form' onSubmit={handleSubmit}>
+      <input
+        type='text'
+        className='form-input'
+        value={text}
+        onChange={(e) => {
+          setText(e.target.value);
+        }}
+      />
+      <button type='submit' className='btn'>
+        add task
+      </button>
+    </form>
+  );
+}
+export default Form;
+```
+
+index.tsx
+
+```tsx
+import { useEffect, useState } from 'react';
+import Form from './Form';
+import List from './List';
+import { type Task } from './types';
 
 function Component() {
-  const [tasks, setTasks] = useState<Task[]>(() => loadTasks());
+  const [tasks, setTasks] = useState<Task[]>([]);
 
   const addTask = (task: Task) => {
     setTasks([...tasks, task]);
   };
 
-  const toggleTask = ({ id }: { id: string }) => {
-    setTasks(
-      tasks.map((task) => {
-        if (task.id === id) {
-          return { ...task, isCompleted: !task.isCompleted };
-        }
-        return task;
-      })
-    );
-  };
-  useEffect(() => {
-    updateStorage(tasks);
-  }, [tasks]);
   return (
     <div>
       <Form addTask={addTask} />
-      <List tasks={tasks} toggleTask={toggleTask} />
+      <List />
     </div>
   );
 }
@@ -1269,6 +1306,27 @@ function Form({ addTask }: FormProps) {
 export default Form;
 ```
 
+index.tsx
+
+```tsx
+const toggleTask = ({ id }: { id: string }) => {
+  setTasks(
+    tasks.map((task) => {
+      if (task.id === id) {
+        return { ...task, isCompleted: !task.isCompleted };
+      }
+      return task;
+    })
+  );
+};
+return (
+  <div>
+    <Form addTask={addTask} />
+    <List tasks={tasks} toggleTask={toggleTask} />
+  </div>
+);
+```
+
 List.tsx
 
 ```tsx
@@ -1300,4 +1358,52 @@ const List = ({ tasks, toggleTask }: ListProps) => {
   );
 };
 export default List;
+```
+
+index.tsx
+
+```tsx
+import { useEffect, useState } from 'react';
+import Form from './Form';
+import List from './List';
+import { type Task } from './types';
+
+// Load tasks from localStorage
+function loadTasks(): Task[] {
+  const storedTasks = localStorage.getItem('tasks');
+  return storedTasks ? JSON.parse(storedTasks) : [];
+}
+
+function updateStorage(tasks: Task[]): void {
+  localStorage.setItem('tasks', JSON.stringify(tasks));
+}
+
+function Component() {
+  const [tasks, setTasks] = useState<Task[]>(() => loadTasks());
+
+  const addTask = (task: Task) => {
+    setTasks([...tasks, task]);
+  };
+
+  const toggleTask = ({ id }: { id: string }) => {
+    setTasks(
+      tasks.map((task) => {
+        if (task.id === id) {
+          return { ...task, isCompleted: !task.isCompleted };
+        }
+        return task;
+      })
+    );
+  };
+  useEffect(() => {
+    updateStorage(tasks);
+  }, [tasks]);
+  return (
+    <div>
+      <Form addTask={addTask} />
+      <List tasks={tasks} toggleTask={toggleTask} />
+    </div>
+  );
+}
+export default Component;
 ```

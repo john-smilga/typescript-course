@@ -1,9 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import Form from './Form';
 import List from './List';
 import { type Task } from './types';
 
-// Load tasks from localStorage
 function loadTasks(): Task[] {
   const storedTasks = localStorage.getItem('tasks');
   return storedTasks ? JSON.parse(storedTasks) : [];
@@ -16,7 +15,7 @@ function updateStorage(tasks: Task[]): void {
 function Component() {
   const [tasks, setTasks] = useState<Task[]>(() => loadTasks());
 
-  const addTask = (task: Task) => {
+  const addTask = (task: Task): void => {
     setTasks([...tasks, task]);
   };
 
@@ -30,14 +29,16 @@ function Component() {
       })
     );
   };
+
   useEffect(() => {
     updateStorage(tasks);
   }, [tasks]);
+
   return (
-    <div>
+    <section>
       <Form addTask={addTask} />
       <List tasks={tasks} toggleTask={toggleTask} />
-    </div>
+    </section>
   );
 }
 export default Component;
