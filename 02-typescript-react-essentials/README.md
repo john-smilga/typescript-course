@@ -999,6 +999,38 @@ export default Component;
 
 ## 09 - RTK
 
+```tsx
+function Component() {
+  return (
+    <div>
+      <h2>Count: 0</h2>
+      <h2>Status: Pending</h2>
+
+      <div className='btn-container'>
+        <button onClick={() => console.log('increment')} className='btn'>
+          Increment
+        </button>
+        <button onClick={() => console.log('decrement')} className='btn'>
+          Decrement
+        </button>
+        <button onClick={() => console.log('reset')} className='btn'>
+          Reset
+        </button>
+      </div>
+      <div className='btn-container'>
+        <button onClick={() => console.log('active')} className='btn'>
+          Set Status to Active
+        </button>
+        <button className='btn' onClick={() => console.log('inactive')}>
+          Set Status to Inactive
+        </button>
+      </div>
+    </div>
+  );
+}
+export default Component;
+```
+
 - counterSlice.ts
 
 ```ts
@@ -1041,6 +1073,8 @@ export const { increment, decrement, reset, setStatus } = counterSlice.actions;
 
 export default counterSlice.reducer;
 ```
+
+store.ts
 
 ```ts
 import { configureStore } from '@reduxjs/toolkit';
@@ -1087,9 +1121,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 const queryClient = new QueryClient();
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <Provider store={store}>
-    <QueryClientProvider client={queryClient}>
-      <App />
-    </QueryClientProvider>
+    <App />
   </Provider>
 );
 ```
@@ -1099,7 +1131,7 @@ index.tsx
 ```tsx
 import { useAppSelector, useAppDispatch } from '../../hooks';
 import { decrement, increment, reset, setStatus } from './counterSlice';
-function RTK() {
+function Component() {
   const { count, status } = useAppSelector((state) => state.counter);
   const dispatch = useAppDispatch();
   return (
@@ -1129,7 +1161,7 @@ function RTK() {
     </div>
   );
 }
-export default RTK;
+export default Component;
 ```
 
 ## 10 - Tasks
