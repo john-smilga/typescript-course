@@ -332,8 +332,4 @@ function App() {
 export default App;
 ```
 
-## React Router
-
-```sh
-npm i react-router-dom
-```
+- START CODING ALONG 😄😄😄😄😄
