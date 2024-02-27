@@ -333,3 +333,202 @@ export default App;
 ```
 
 - START CODING ALONG 😄😄😄😄😄
+
+## React Router
+
+```sh
+npm i react-router-dom
+```
+
+App.tsx
+
+```tsx
+import { RouterProvider, createBrowserRouter } from 'react-router-dom';
+
+const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <Landing />,
+  },
+  {
+    path: '/cart',
+    element: <Cart />,
+  },
+]);
+
+const App = () => {
+  return <RouterProvider router={router} />;
+};
+export default App;
+```
+
+## Link Component
+
+Cart.tsx
+
+```tsx
+import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
+function Cart() {
+  return (
+    <div>
+      <h1 className='text-4xl'>Cart Page</h1>
+      <Link to='/' className='text-7xl text-red-900'>
+        back home
+      </Link>
+      <Button asChild size='lg'>
+        <Link to='/'>home button</Link>
+      </Button>
+    </div>
+  );
+}
+export default Cart;
+```
+
+## Outlet
+
+App.tsx
+
+```tsx
+const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <HomeLayout />,
+
+    children: [
+      {
+        index: true,
+        element: <Landing />,
+      },
+      {
+        path: 'products',
+        element: <Products />,
+      },
+      {
+        path: 'products/:id',
+        element: <SingleProduct />,
+      },
+      {
+        path: 'cart',
+        element: <Cart />,
+      },
+      { path: 'about', element: <About /> },
+      {
+        path: 'checkout',
+        element: <Checkout />,
+      },
+      {
+        path: 'orders',
+        element: <Orders />,
+      },
+    ],
+  },
+  {
+    path: '/login',
+    element: <Login />,
+  },
+  {
+    path: '/register',
+    element: <Register />,
+  },
+]);
+```
+
+HomeLayout.tsx
+
+```tsx
+import { Outlet } from 'react-router-dom';
+
+const HomeLayout = () => {
+  return (
+    <>
+      <header>header</header>
+      <nav>navbar</nav>
+      <Outlet />
+    </>
+  );
+};
+export default HomeLayout;
+```
+
+## Header
+
+- create components/Header.tsx (basic return)
+- create components/index.ts(optional)
+
+```ts
+export { default as Header } from './Header';
+```
+
+- render in HomeLayout
+
+```tsx
+import { Link, useNavigate } from 'react-router-dom';
+import { Button } from './ui/button';
+import { useState } from 'react';
+const Header = () => {
+  const navigate = useNavigate();
+
+  // temp
+  const [user, setUser] = useState<{ username: string } | null>({
+    username: 'demo user',
+  });
+
+  const handleLogout = () => {
+    navigate('/');
+    setUser(null);
+  };
+
+  return (
+    <header>
+      <div className='align-element flex justify-center sm:justify-end py-2'>
+        {/* USER */}
+        {user ? (
+          <div className='flex gap-x-2 sm:gap-x-8 items-center'>
+            <p className='text-xs sm:text-sm'>Hello, {user.username}</p>
+            <Button variant='link' size='sm' onClick={handleLogout}>
+              Logout
+            </Button>
+          </div>
+        ) : (
+          <div className='flex gap-x-6 justify-center items-center -mr-4'>
+            <Button asChild variant='link' size='sm'>
+              <Link to='/login'>Sign in / Guest</Link>
+            </Button>
+            <Button asChild variant='link' size='sm'>
+              <Link to='/register'>Register</Link>
+            </Button>
+          </div>
+        )}
+      </div>
+    </header>
+  );
+};
+export default Header;
+```
+
+## Tailwind Custom Class
+
+index.css
+
+```css
+@layer components {
+  .align-element {
+    @apply mx-auto max-w-6xl px-8;
+  }
+}
+```
+
+HomeLayout.tsx
+
+```tsx
+<div className='align-element py-20'>
+  <Outlet />
+</div>
+```
+
+Header.tsx
+
+```tsx
+<div className='align-element flex ......'>...</div>
+```
