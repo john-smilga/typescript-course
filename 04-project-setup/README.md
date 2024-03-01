@@ -1,11 +1,25 @@
-## Setup
+## Start Project
+
+```sh
+npm install
+```
+
+```sh
+npm run dev
+```
+
+## Vite Setup
 
 ```sh
 npm create vite@latest comfy-store -- --template react-ts
 ```
 
 ```sh
-npm install && npm run dev
+npm install
+```
+
+```sh
+npm run dev
 ```
 
 ## Boilerplate Code
