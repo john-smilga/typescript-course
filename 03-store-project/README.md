@@ -1504,3 +1504,165 @@ const HomeLayout = () => {
 };
 export default HomeLayout;
 ```
+
+## Install Shadcn Form Components
+
+- [Form Component](https://ui.shadcn.com/docs/components/form)
+
+- Label, Input, Select, Slider, Checkbox
+
+```sh
+npx shadcn-ui@latest add label input select slider checkbox
+```
+
+## Filters - Initial Setup
+
+```tsx
+import { Form, useLoaderData, Link } from 'react-router-dom';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Button } from './ui/button';
+
+function Filters() {
+  return (
+    <Form className='border rounded-md px-8 py-4 grid gap-x-4 gap-y-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 items-center'>
+      <div className='mb-2'>
+        <Label htmlFor='search'>Search Product</Label>
+        <Input id='search' name='search' type='text' defaultValue='' />
+      </div>
+      <Button type='submit' size='sm' className='self-end mb-2'>
+        search
+      </Button>
+      <Button
+        type='button'
+        asChild
+        size='sm'
+        variant='outline'
+        className='self-end mb-2'
+      >
+        <Link to='/products'>reset</Link>
+      </Button>
+    </Form>
+  );
+}
+export default Filters;
+```
+
+## API
+
+- [API DOCS](https://documenter.getpostman.com/view/18152321/2s9Xy5KpTi)
+
+## Products Loader
+
+```ts
+export const loader: LoaderFunction = async ({
+  request,
+}): Promise<ProductsResponse> => {
+  const params = Object.fromEntries([
+    ...new URL(request.url).searchParams.entries(),
+  ]);
+
+  const response = await customFetch<ProductsResponse>(url, { params });
+  console.log(response.data);
+
+  return { ...response.data, params };
+};
+```
+
+new URL(request.url) creates a new URL object from the URL in the request.
+.searchParams.entries() gets an iterator for entries in the query parameters, where each entry is an array of [key, value].
+
+... is the spread operator, which expands the entries into individual elements.
+Object.fromEntries([...]) converts these entries back into an object, where each key-value pair becomes a property in the object.
+
+So, if your URL is http://example.com?param1=value1&param2=value2, the resulting params object would be { param1: 'value1', param2: 'value2' }.
+
+## Setup Params Type
+
+utils/types.ts
+
+```ts
+export type Params = {
+  search?: string;
+  category?: string;
+  company?: string;
+  order?: string;
+  price?: string;
+  shipping?: string;
+  page?: number;
+};
+
+export type ProductsResponseWithParams = ProductsResponse & { params: Params };
+```
+
+## Implement Params
+
+- in Products setup loader return : Response<ProductsResponseWithParams>
+
+Filters.tsx
+
+```tsx
+import { type ProductsResponseWithParams } from '@/utils';
+function Filters() {
+  const { meta, params } = useLoaderData() as ProductsResponseWithParams;
+  const { search } = params;
+  return (
+    <Form>
+      <div>
+        <Label htmlFor='search'>Search Product</Label>
+        <Input id='search' name='search' type='text' defaultValue={search} />
+      </div>
+    </Form>
+  );
+}
+export default Filters;
+```
+
+## FormInput Component
+
+- create components/FormInput.tsx
+- import and setup in Filters
+
+```tsx
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+
+type FormInputProps = {
+  name: string;
+  type: string;
+  label?: string;
+  defaultValue?: string;
+};
+
+function FormInput({ label, name, type, defaultValue }: FormInputProps) {
+  return (
+    <div className='mb-2'>
+      <Label htmlFor={name} className='capitalize'>
+        {label || name}
+      </Label>
+      <Input id={name} name={name} type={type} defaultValue={defaultValue} />
+    </div>
+  );
+}
+export default FormInput;
+```
+
+```tsx
+import FormInput from './FormInput';
+
+function Filters() {
+  const { meta, params } = useLoaderData() as ProductsResponseWithParams;
+  const { search } = params;
+  return (
+    <Form className='border rounded-md px-8 py-4 grid gap-x-4 gap-y-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 items-center'>
+      {/* search */}
+      <FormInput
+        type='search'
+        label='search product'
+        name='search'
+        defaultValue={search}
+      />
+    </Form>
+  );
+}
+```
