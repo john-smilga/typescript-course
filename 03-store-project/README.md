@@ -1652,7 +1652,8 @@ import FormInput from './FormInput';
 
 function Filters() {
   const { meta, params } = useLoaderData() as ProductsResponseWithParams;
-  const { search } = params;
+  const { search, company, category, shipping, order, price } = params;
+
   return (
     <Form className='border rounded-md px-8 py-4 grid gap-x-4 gap-y-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 items-center'>
       {/* search */}
@@ -1666,3 +1667,186 @@ function Filters() {
   );
 }
 ```
+
+## FormSelect.tsx
+
+[Shadcn Select](https://ui.shadcn.com/docs/components/select)
+
+- create components/FormSelect.tsx
+- render in Filters.tsx
+
+```tsx
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+
+import { Label } from '@/components/ui/label';
+
+type SelectInputProps = {
+  name: string;
+  label?: string;
+  defaultValue?: string;
+  options: string[];
+};
+
+function SelectInput({ label, name, options, defaultValue }: SelectInputProps) {
+  return (
+    <div className='mb-2'>
+      <Label htmlFor={name} className='capitalize'>
+        {label || name}
+      </Label>
+      <Select defaultValue={defaultValue || options[0]} name={name}>
+        <SelectTrigger id={name}>
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {options.map((item) => {
+            return (
+              <SelectItem key={item} value={item}>
+                {item}
+              </SelectItem>
+            );
+          })}
+        </SelectContent>
+      </Select>
+    </div>
+  );
+}
+export default SelectInput;
+```
+
+Filters.tsx
+
+```tsx
+{
+  /* CATEGORIES */
+}
+<FormSelect
+  label='select category'
+  name='category'
+  options={meta.categories}
+  defaultValue={category}
+/>;
+{
+  /* COMPANIES */
+}
+<FormSelect
+  label='select company'
+  name='company'
+  options={meta.companies}
+  defaultValue={company}
+/>;
+{
+  /* ORDER */
+}
+
+<FormSelect
+  label='order by'
+  name='order'
+  options={['a-z', 'z-a', 'high', 'low']}
+  defaultValue={order}
+/>;
+```
+
+## FormRange
+
+[Shadcn Slider](https://ui.shadcn.com/docs/components/slider)
+
+Filters.tsx
+
+```tsx
+<FormRange label='price' name='price' defaultValue={price} />
+```
+
+FormRange.tsx
+
+```tsx
+import { formatAsDollars } from '@/utils';
+import { useState } from 'react';
+
+import { Label } from '@/components/ui/label';
+import { Slider } from './ui/slider';
+type FormRangeProps = {
+  name: string;
+  label?: string;
+  defaultValue?: string;
+};
+
+function FormRange({ name, label, defaultValue }: FormRangeProps) {
+  const step = 1000;
+  const maxPrice = 100000;
+  const defaultPrice = defaultValue ? Number(defaultValue) : maxPrice;
+  const [selectedPrice, setSelectedPrice] = useState(defaultPrice);
+
+  return (
+    <div className='mb-2'>
+      <Label htmlFor={name} className='capitalize flex justify-between'>
+        {label || name}
+        <span>{formatAsDollars(selectedPrice)}</span>
+      </Label>
+      <Slider
+        id={name}
+        name={name}
+        step={step}
+        max={maxPrice}
+        value={[selectedPrice]}
+        onValueChange={(value) => setSelectedPrice(value[0])}
+        className='mt-4'
+      />
+    </div>
+  );
+}
+export default FormRange;
+```
+
+## FormCheckbox
+
+[Shadcn Checkbox](https://ui.shadcn.com/docs/components/checkbox)
+
+Filters.tsx
+
+```tsx
+<FormCheckbox label='free shipping' name='shipping' defaultValue={shipping} />
+```
+
+FormCheckbox.tsx
+
+```tsx
+import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
+
+type FormCheckboxProps = {
+  name: string;
+  label?: string;
+  defaultValue?: string;
+};
+
+function FormCheckbox({ name, label, defaultValue }: FormCheckboxProps) {
+  const defaultChecked = defaultValue === 'on' ? true : false;
+
+  return (
+    <div className='mb-2 flex justify-between self-end'>
+      <Label htmlFor={name} className='capitalize'>
+        {label || name}
+      </Label>
+      <Checkbox id={name} name={name} defaultChecked={defaultChecked} />
+    </div>
+  );
+}
+export default FormCheckbox;
+```
+
+## Pagination
+
+[Shadcn Pagination](https://ui.shadcn.com/docs/components/pagination)
+
+```sh
+npx shadcn-ui@latest add pagination
+
+```
+
+- customize
