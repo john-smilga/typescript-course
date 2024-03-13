@@ -12,12 +12,12 @@ function NavLinks() {
         return (
           <NavLink
             to={link.href}
+            key={link.label}
             className={({ isActive }) => {
               return `capitalize font-light tracking-wide ${
                 isActive ? 'text-primary' : ''
               }`;
             }}
-            key={link.label}
           >
             {link.label}
           </NavLink>

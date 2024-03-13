@@ -6,7 +6,6 @@ function CartButton() {
   const numItemsInCart = useAppSelector(
     (state) => state.cartState.numItemsInCart
   );
-
   return (
     <Button
       asChild

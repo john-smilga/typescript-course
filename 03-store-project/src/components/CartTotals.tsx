@@ -3,11 +3,10 @@ import { formatAsDollars } from '@/utils';
 import { Card, CardTitle } from '@/components/ui/card';
 import { Separator } from './ui/separator';
 
-const CartTotals = () => {
+function CartTotals() {
   const { cartTotal, shipping, tax, orderTotal } = useAppSelector(
     (state) => state.cartState
   );
-
   return (
     <Card className='p-8 bg-muted'>
       <CartTotalRow label='Subtotal' amount={cartTotal} />
@@ -18,7 +17,8 @@ const CartTotals = () => {
       </CardTitle>
     </Card>
   );
-};
+}
+export default CartTotals;
 
 function CartTotalRow({
   label,
@@ -31,7 +31,7 @@ function CartTotalRow({
 }) {
   return (
     <>
-      <p className={`flex justify-between ${lastRow ? 'text-sm' : 'text-sm'}`}>
+      <p className='flex justify-between text-sm'>
         <span>{label}</span>
         <span>{formatAsDollars(amount)}</span>
       </p>
@@ -39,5 +39,3 @@ function CartTotalRow({
     </>
   );
 }
-
-export default CartTotals;

@@ -30,17 +30,19 @@ export const action =
       store.dispatch(loginUser({ username, jwt }));
       return redirect('/');
     } catch (error) {
-      // console.log(error);
+      console.log(error);
       toast({ description: 'Login Failed' });
       return null;
     }
   };
+
 function Login() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+
   const loginAsGuestUser = async (): Promise<void> => {
     try {
-      const response = await customFetch.post('/auth/local', {
+      const response: AxiosResponse = await customFetch.post('/auth/local', {
         identifier: 'test@test.com',
         password: 'secret',
       });
@@ -60,12 +62,12 @@ function Login() {
           <CardTitle className='text-center'>Login</CardTitle>
         </CardHeader>
         <CardContent>
-          <Form method='POST'>
+          <Form method='post'>
             <FormInput type='email' label='email' name='identifier' />
             <FormInput type='password' name='password' />
-
-            <SubmitBtn text='Login' />
+            <SubmitBtn text='Login' className='w-full mt-4' />
             <Button
+              type='button'
               variant='outline'
               onClick={loginAsGuestUser}
               className='w-full mt-4'
@@ -73,7 +75,7 @@ function Login() {
               Guest User
             </Button>
             <p className='text-center mt-4'>
-              Not a member yet?
+              Not a member yet?{' '}
               <Button type='button' asChild variant='link'>
                 <Link to='/register'>Register</Link>
               </Button>

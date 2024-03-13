@@ -1,13 +1,13 @@
 import { useAppSelector } from '@/hooks';
 import { Card } from './ui/card';
-
 import {
   FirstColumn,
   SecondColumn,
   ThirdColumn,
   FourthColumn,
 } from './CartItemColumns';
-const CartItemsList = () => {
+
+function CartItemsList() {
   const cartItems = useAppSelector((state) => state.cartState.cartItems);
 
   return (
@@ -33,6 +33,5 @@ const CartItemsList = () => {
       })}
     </div>
   );
-};
-
+}
 export default CartItemsList;

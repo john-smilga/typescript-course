@@ -3,20 +3,20 @@ import ProductsGrid from './ProductsGrid';
 import ProductsList from './ProductsList';
 import { useState } from 'react';
 import { LayoutGrid, List } from 'lucide-react';
-import { ProductsResponse } from '@/utils';
+import { type ProductsResponse } from '@/utils';
 import { Button } from './ui/button';
 import { Separator } from './ui/separator';
 
-const ProductsContainer = () => {
+function ProductsContainer() {
   const { meta } = useLoaderData() as ProductsResponse;
   const totalProducts = meta.pagination.total;
-  const [layout, setLayout] = useState<'grid' | 'list'>('grid');
 
+  const [layout, setLayout] = useState<'grid' | 'list'>('grid');
   return (
     <>
       {/* HEADER */}
       <section>
-        <div className='flex justify-between items-center mt-8 '>
+        <div className='flex justify-between items-center mt-8'>
           <h4 className='font-medium text-md'>
             {totalProducts} product{totalProducts > 1 && 's'}
           </h4>
@@ -30,8 +30,8 @@ const ProductsContainer = () => {
             </Button>
             <Button
               onClick={() => setLayout('list')}
-              size='icon'
               variant={layout === 'list' ? 'default' : 'ghost'}
+              size='icon'
             >
               <List />
             </Button>
@@ -39,7 +39,6 @@ const ProductsContainer = () => {
         </div>
         <Separator className='mt-4' />
       </section>
-
       {/* PRODUCTS */}
       <div>
         {totalProducts === 0 ? (
@@ -54,6 +53,5 @@ const ProductsContainer = () => {
       </div>
     </>
   );
-};
-
+}
 export default ProductsContainer;

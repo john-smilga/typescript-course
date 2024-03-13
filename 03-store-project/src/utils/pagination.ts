@@ -1,27 +1,40 @@
-export const constructUrl = (
-  pageNumber: number,
-  search: string,
-  pathname: string
-) => {
+type ConstructUrlParams = {
+  pageNumber: number;
+  search: string;
+  pathname: string;
+};
+
+export const constructUrl = ({
+  pageNumber,
+  search,
+  pathname,
+}: ConstructUrlParams): string => {
   const searchParams = new URLSearchParams(search);
   searchParams.set('page', pageNumber.toString());
+
   return `${pathname}?${searchParams.toString()}`;
 };
 
-export const constructPrevOrNextUrl = (
-  direction: 'prev' | 'next',
-  page: number,
-  pageCount: number,
-  search: string,
-  pathname: string
-): string => {
-  if (direction === 'prev') {
-    let prevPage = page - 1;
-    if (prevPage < 1) prevPage = pageCount;
-    return constructUrl(prevPage, search, pathname);
-  }
+type ConstructPrevOrNextParams = {
+  currentPage: number;
+  pageCount: number;
+  search: string;
+  pathname: string;
+};
 
-  let nextPage = page + 1;
+export const constructPrevOrNextUrl = ({
+  currentPage,
+  pageCount,
+  search,
+  pathname,
+}: ConstructPrevOrNextParams): { prevUrl: string; nextUrl: string } => {
+  let prevPage = currentPage - 1;
+  if (prevPage < 1) prevPage = pageCount;
+  const prevUrl = constructUrl({ pageNumber: prevPage, search, pathname });
+
+  let nextPage = currentPage + 1;
   if (nextPage > pageCount) nextPage = 1;
-  return constructUrl(nextPage, search, pathname);
+  const nextUrl = constructUrl({ pageNumber: nextPage, search, pathname });
+
+  return { prevUrl, nextUrl };
 };

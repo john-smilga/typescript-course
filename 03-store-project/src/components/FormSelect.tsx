@@ -15,7 +15,7 @@ type SelectInputProps = {
   options: string[];
 };
 
-function SelectInput({ label, name, options, defaultValue }: SelectInputProps) {
+function FormSelect({ label, name, options, defaultValue }: SelectInputProps) {
   return (
     <div className='mb-2'>
       <Label htmlFor={name} className='capitalize'>
@@ -38,4 +38,4 @@ function SelectInput({ label, name, options, defaultValue }: SelectInputProps) {
     </div>
   );
 }
-export default SelectInput;
+export default FormSelect;

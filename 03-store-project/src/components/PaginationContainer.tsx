@@ -26,7 +26,7 @@ function PaginationContainer() {
 
   const renderPagination = pages.map((pageNumber) => {
     const isActive = pageNumber === page;
-    const url = constructUrl(pageNumber, search, pathname);
+    const url = constructUrl({ pageNumber, search, pathname });
 
     return (
       <PaginationItem key={pageNumber}>
@@ -36,32 +36,21 @@ function PaginationContainer() {
       </PaginationItem>
     );
   });
-
+  const { prevUrl, nextUrl } = constructPrevOrNextUrl({
+    currentPage: page,
+    pageCount,
+    search,
+    pathname,
+  });
   return (
     <Pagination className='mt-16'>
       <PaginationContent>
         <PaginationItem>
-          <PaginationPrevious
-            to={constructPrevOrNextUrl(
-              'prev',
-              page,
-              pageCount,
-              search,
-              pathname
-            )}
-          />
+          <PaginationPrevious to={prevUrl} />
         </PaginationItem>
         {renderPagination}
         <PaginationItem>
-          <PaginationNext
-            to={constructPrevOrNextUrl(
-              'next',
-              page,
-              pageCount,
-              search,
-              pathname
-            )}
-          />
+          <PaginationNext to={nextUrl} />
         </PaginationItem>
       </PaginationContent>
     </Pagination>

@@ -1306,6 +1306,8 @@ export default HeroCarousel;
 
 ## Products Page - Setup
 
+- fix bugs
+
 - create following components and setup export
   - Filters
   - ProductsContainer
@@ -2542,6 +2544,37 @@ export const { addItem, clearCart, removeItem, editItem } = cartSlice.actions;
 export default cartSlice.reducer;
 ```
 
+## CartButton
+
+```tsx
+import { Button } from './ui/button';
+import { ShoppingCart } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { useAppSelector } from '@/hooks';
+function CartButton() {
+  const numItemsInCart = useAppSelector(
+    (state) => state.cartState.numItemsInCart
+  );
+
+  return (
+    <Button
+      asChild
+      variant='outline'
+      size='icon'
+      className='flex justify-center items-center relative'
+    >
+      <Link to='/cart'>
+        <ShoppingCart />
+        <span className='absolute -top-3 -right-3 bg-primary text-white rounded-full h-6 w-6 flex items-center justify-center text-xs'>
+          {numItemsInCart}
+        </span>
+      </Link>
+    </Button>
+  );
+}
+export default CartButton;
+```
+
 ## SingleProduct - AddItem
 
 ```tsx
@@ -2798,6 +2831,8 @@ CartItemsList.tsx
 <ThirdColumn amount={amount} cartID={cartID} />
 <FourthColumn price={price} />
 ```
+
+[Tailwind Classes](https://tailwindcss.com/docs/content-configuration)
 
 ## UserSlice
 
@@ -3128,4 +3163,594 @@ export const action =
       return null;
     }
   };
+```
+
+## Header Component
+
+```tsx
+import { Link, useNavigate } from 'react-router-dom';
+import { Button } from './ui/button';
+import { useAppDispatch, useAppSelector } from '@/hooks';
+
+import { logoutUser } from '../features/user/userSlice';
+import { clearCart } from '../features/cart/cartSlice';
+import { useToast } from './ui/use-toast';
+
+const Header = () => {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const user = useAppSelector((state) => state.userState.user);
+
+  const handleLogout = () => {
+    dispatch(clearCart());
+    dispatch(logoutUser());
+    toast({ description: 'Logged out' });
+    navigate('/');
+  };
+
+  return (
+    <header>
+      <div className='align-element flex justify-center sm:justify-end py-2'>
+        {/* USER */}
+        {user ? (
+          <div className='flex gap-x-2 sm:gap-x-8 items-center'>
+            <p className='text-xs sm:text-sm'>Hello, {user.username}</p>
+            <Button variant='link' size='sm' onClick={handleLogout}>
+              Logout
+            </Button>
+          </div>
+        ) : (
+          <div className='flex gap-x-6 justify-center items-center -mr-4'>
+            <Button asChild variant='link' size='sm'>
+              <Link to='/login'>Sign in / Guest</Link>
+            </Button>
+            <Button asChild variant='link' size='sm'>
+              <Link to='/register'>Register</Link>
+            </Button>
+          </div>
+        )}
+      </div>
+    </header>
+  );
+};
+export default Header;
+```
+
+## NavLinks
+
+```tsx
+import { links } from '@/utils';
+import { NavLink } from 'react-router-dom';
+import { useAppSelector } from '@/hooks';
+function NavLinks() {
+  const user = useAppSelector((state) => state.userState.user);
+  return (
+    <div className='hidden lg:flex justify-center items-center gap-x-4'>
+      {links.map((link) => {
+        const restrictedRoutes =
+          link.href === 'checkout' || link.href === 'orders';
+        if (restrictedRoutes && !user) return null;
+        return (
+          <NavLink
+            to={link.href}
+            className={({ isActive }) => {
+              return `capitalize font-light tracking-wide ${
+                isActive ? 'text-primary' : ''
+              }`;
+            }}
+            key={link.label}
+          >
+            {link.label}
+          </NavLink>
+        );
+      })}
+    </div>
+  );
+}
+export default NavLinks;
+```
+
+## LinksDropdown
+
+```tsx
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { AlignLeft } from 'lucide-react';
+import { Button } from './ui/button';
+import { links } from '@/utils';
+import { NavLink } from 'react-router-dom';
+import { useAppSelector } from '@/hooks';
+
+function LinksDropdown() {
+  const user = useAppSelector((state) => state.userState.user);
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild className='lg:hidden'>
+        <Button variant='outline' size='icon'>
+          <AlignLeft />
+
+          <span className='sr-only'>Toggle links</span>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent
+        className='w-52 lg:hidden '
+        align='start'
+        sideOffset={25}
+      >
+        {links.map((link) => {
+          const restrictedRoutes =
+            link.href === 'checkout' || link.href === 'orders';
+          if (restrictedRoutes && !user) return null;
+          return (
+            <DropdownMenuItem key={link.label}>
+              <NavLink
+                to={link.href}
+                className={({ isActive }) => {
+                  return `capitalize w-full ${isActive ? 'text-primary' : ''}`;
+                }}
+              >
+                {link.label}
+              </NavLink>
+            </DropdownMenuItem>
+          );
+        })}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+export default LinksDropdown;
+```
+
+## Cart Page
+
+```tsx
+import { useAppSelector } from '@/hooks';
+import { CartItemsList, SectionTitle, CartTotals } from '@/components';
+import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+
+function Cart() {
+  const user = useAppSelector((state) => state.userState.user);
+
+  const numItemsInCart = useAppSelector(
+    (state) => state.cartState.numItemsInCart
+  );
+  if (numItemsInCart === 0) {
+    return <SectionTitle text='Empty cart' />;
+  }
+
+  return (
+    <>
+      <SectionTitle text='Shopping Cart' />
+      <div className='mt-8 grid gap-8 lg:grid-cols-12'>
+        <div className='lg:col-span-8'>
+          <CartItemsList />
+        </div>
+        <div className='lg:col-span-4 lg:pl-4'>
+          <CartTotals />
+
+          <Button asChild className='mt-8 w-full'>
+            {user ? (
+              <Link to='/checkout'> Proceed to checkout</Link>
+            ) : (
+              <Link to='/login'>Please Login</Link>
+            )}
+          </Button>
+        </div>
+      </div>
+    </>
+  );
+}
+export default Cart;
+```
+
+## Checkout Page
+
+- create CheckoutForm
+- import and setup loader in the App.tsx
+
+```tsx
+import { useAppSelector } from '@/hooks';
+import { CheckoutForm, SectionTitle, CartTotals } from '@/components';
+import { LoaderFunction, redirect } from 'react-router-dom';
+import { toast } from '@/components/ui/use-toast';
+import { type ReduxStore } from '@/store';
+
+export const loader =
+  (store: ReduxStore): LoaderFunction =>
+  async (): Promise<Response | null> => {
+    const user = store.getState().userState.user;
+    if (!user) {
+      toast({ description: 'Please login to continue' });
+      return redirect('/login');
+    }
+
+    return null;
+  };
+
+const Checkout = () => {
+  const cartTotal = useAppSelector((state) => state.cartState.cartTotal);
+  if (cartTotal === 0) {
+    return <SectionTitle text='Your cart is empty' />;
+  }
+  return (
+    <>
+      <SectionTitle text='Place your order' />
+      <div className='mt-8 grid gap-8  md:grid-cols-2 items-start'>
+        <CheckoutForm />
+        <CartTotals />
+      </div>
+    </>
+  );
+};
+export default Checkout;
+```
+
+## Checkout Type
+
+```ts
+export type Checkout = {
+  name: string;
+  address: string;
+  chargeTotal: number;
+  orderTotal: string;
+  cartItems: CartItem[];
+  numItemsInCart: number;
+};
+```
+
+## Checkout Form
+
+```tsx
+import { ActionFunction, Form, redirect } from 'react-router-dom';
+import FormInput from './FormInput';
+import SubmitBtn from './SubmitBtn';
+import { customFetch, formatAsDollars, type Checkout } from '@/utils';
+import { toast } from '@/components/ui/use-toast';
+import { clearCart } from '../features/cart/cartSlice';
+import { ReduxStore } from '@/store';
+
+export const action =
+  (store: ReduxStore): ActionFunction =>
+  async ({ request }) => {
+    const formData = await request.formData();
+    const name = formData.get('name') as string;
+    const address = formData.get('name') as string;
+
+    if (!name || !address) {
+      toast({ description: 'please fill out all fields' });
+      return null;
+    }
+
+    const user = store.getState().userState.user;
+    if (!user) {
+      toast({ description: 'please login to place an order' });
+      return redirect('/login');
+    }
+    const { cartItems, orderTotal, numItemsInCart } =
+      store.getState().cartState;
+
+    const info: Checkout = {
+      name,
+      address,
+      chargeTotal: orderTotal,
+      orderTotal: formatAsDollars(orderTotal),
+      cartItems,
+      numItemsInCart,
+    };
+    try {
+      await customFetch.post(
+        '/orders',
+        { data: info },
+        {
+          headers: {
+            Authorization: `Bearer ${user.jwt}`,
+          },
+        }
+      );
+
+      store.dispatch(clearCart());
+      toast({ description: 'order placed' });
+      return redirect('/orders');
+    } catch (error) {
+      toast({ description: 'order failed' });
+      return null;
+    }
+  };
+const CheckoutForm = () => {
+  return (
+    <Form method='POST' className='flex flex-col gap-y-4'>
+      <h4 className='font-medium text-xl mb-4'>Shipping Information</h4>
+      <FormInput label='first name' name='name' type='text' />
+      <FormInput label='address' name='address' type='text' />
+      <div className='mt-4'>
+        <SubmitBtn text='Place Your Order' />
+      </div>
+    </Form>
+  );
+};
+export default CheckoutForm;
+```
+
+## OrdersResponse Type
+
+```ts
+export type Order = {
+  id: number;
+  attributes: {
+    address: string;
+    cartItems: CartItem[];
+    createdAt: string;
+    name: string;
+    numItemsInCart: number;
+    orderTotal: string;
+    publishedAt: string;
+    updatedAt: string;
+  };
+};
+
+export type OrdersMeta = {
+  pagination: Pagination;
+};
+
+export type OrdersResponse = {
+  data: Order[];
+  meta: OrdersMeta;
+};
+```
+
+## Orders Page
+
+- create OrdersList, ComplexPaginationContainer
+- setup loader in the App.tsx
+
+```tsx
+import { LoaderFunction, redirect, useLoaderData } from 'react-router-dom';
+import { toast } from '@/components/ui/use-toast';
+import { customFetch } from '@/utils';
+import {
+  OrdersList,
+  ComplexPaginationContainer,
+  SectionTitle,
+} from '@/components';
+import { ReduxStore } from '@/store';
+import { type OrdersResponse } from '@/utils';
+export const loader =
+  (store: ReduxStore): LoaderFunction =>
+  async ({ request }): Promise<OrdersResponse | Response | null> => {
+    const user = store.getState().userState.user;
+
+    if (!user) {
+      toast({ description: 'Please login to continue' });
+      return redirect('/login');
+    }
+    const params = Object.fromEntries([
+      ...new URL(request.url).searchParams.entries(),
+    ]);
+
+    try {
+      const response = await customFetch.get<OrdersResponse>('/orders', {
+        params,
+        headers: {
+          Authorization: `Bearer ${user.jwt}`,
+        },
+      });
+
+      return { ...response.data };
+    } catch (error) {
+      console.log(error);
+      toast({ description: 'Failed to fetch orders' });
+      return null;
+    }
+  };
+const Orders = () => {
+  const { meta } = useLoaderData() as OrdersResponse;
+  if (meta.pagination.total < 1) {
+    return <SectionTitle text='Please make an order' />;
+  }
+  return (
+    <>
+      <SectionTitle text='Your Orders' />
+      <OrdersList />
+      <ComplexPaginationContainer />
+    </>
+  );
+};
+export default Orders;
+```
+
+## Orders List
+
+[Table Component](https://ui.shadcn.com/docs/components/table)
+
+```sh
+npx shadcn-ui@latest add table
+
+```
+
+```tsx
+import { useLoaderData } from 'react-router-dom';
+
+import { type OrdersResponse } from '@/utils';
+
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+
+function OrdersList() {
+  const { data: orders, meta } = useLoaderData() as OrdersResponse;
+
+  return (
+    <div className='mt-16'>
+      <h4 className='mb-4 capitalize'>
+        total orders : {meta.pagination.total}
+      </h4>
+      <Table>
+        <TableCaption>A list of your recent orders.</TableCaption>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Name</TableHead>
+            <TableHead>Address</TableHead>
+            <TableHead className='w-[100px]'>Products</TableHead>
+            <TableHead className='w-[100px]'>Cost</TableHead>
+            <TableHead>Date</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {orders.map((order) => {
+            const { name, address, numItemsInCart, orderTotal, createdAt } =
+              order.attributes;
+            return (
+              <TableRow key={order.id}>
+                <TableCell>{name}</TableCell>
+                <TableCell>{address}</TableCell>
+                <TableCell className='text-center'>{numItemsInCart}</TableCell>
+                <TableCell>{orderTotal}</TableCell>
+                <TableCell>{new Date(createdAt).toDateString()}</TableCell>
+              </TableRow>
+            );
+          })}
+        </TableBody>
+      </Table>
+    </div>
+  );
+}
+export default OrdersList;
+```
+
+## Complex Pagination
+
+```tsx
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+  PaginationEllipsis,
+} from '@/components/ui/pagination';
+import {
+  constructUrl,
+  constructPrevOrNextUrl,
+  type OrdersResponse,
+} from '@/utils';
+
+import { useLoaderData, useLocation } from 'react-router-dom';
+
+function ComplexPaginationContainer() {
+  const { meta } = useLoaderData() as OrdersResponse;
+  const { pageCount, page } = meta.pagination;
+
+  const { search, pathname } = useLocation();
+
+  if (pageCount < 2) return null;
+
+  // const renderPagination = pages.map((pageNumber) => {
+  //   const isActive = pageNumber === page;
+  //   const url = constructUrl(pageNumber, search, pathname);
+
+  //   return (
+  //     <PaginationItem key={pageNumber}>
+  //       <PaginationLink to={url} isActive={isActive}>
+  //         {pageNumber}
+  //       </PaginationLink>
+  //     </PaginationItem>
+  //   );
+  // });
+
+  const constructButton = ({
+    pageNumber,
+    isActive,
+  }: {
+    pageNumber: number;
+    isActive: boolean;
+  }): React.ReactNode => {
+    const url = constructUrl({ pageNumber, search, pathname });
+    return (
+      <PaginationItem key={pageNumber}>
+        <PaginationLink to={url} isActive={isActive}>
+          {pageNumber}
+        </PaginationLink>
+      </PaginationItem>
+    );
+  };
+
+  const constructEllipsis = (key: string): React.ReactNode => {
+    return (
+      <PaginationItem key={key}>
+        <PaginationEllipsis />
+      </PaginationItem>
+    );
+  };
+
+  const renderPagination = () => {
+    let pages: React.ReactNode[] = [];
+    // first page
+    pages.push(constructButton({ pageNumber: 1, isActive: page === 1 }));
+    // ellipsis
+    if (page > 2) {
+      pages.push(constructEllipsis('dots-1'));
+    }
+    // active page
+    if (page !== 1 && page !== pageCount) {
+      pages.push(constructButton({ pageNumber: page, isActive: true }));
+    }
+    // ellipsis
+    if (page < pageCount - 1) {
+      pages.push(constructEllipsis('dots-2'));
+    }
+    // last page
+    pages.push(
+      constructButton({ pageNumber: pageCount, isActive: page === pageCount })
+    );
+    return pages;
+  };
+  const { prevUrl, nextUrl } = constructPrevOrNextUrl({
+    currentPage: page,
+    pageCount,
+    search,
+    pathname,
+  });
+  return (
+    <Pagination className='mt-16'>
+      <PaginationContent>
+        <PaginationItem>
+          <PaginationPrevious to={prevUrl} />
+        </PaginationItem>
+        {renderPagination()}
+        <PaginationItem>
+          <PaginationNext to={nextUrl} />
+        </PaginationItem>
+      </PaginationContent>
+    </Pagination>
+  );
+}
+export default ComplexPaginationContainer;
+```
+
+## Setup Redirects
+
+public/\_redirects
+
+```
+/* /index.html 200
+```
+
+## Build Project Locally
+
+```sh
+npm run build
+
 ```

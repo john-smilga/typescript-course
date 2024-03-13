@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { SubmitBtn, FormInput } from '@/components';
 import { customFetch } from '@/utils';
 import { toast } from '@/components/ui/use-toast';
+import { AxiosError } from 'axios';
 
 export const action: ActionFunction = async ({
   request,
@@ -16,7 +17,12 @@ export const action: ActionFunction = async ({
     return redirect('/login');
   } catch (error) {
     // console.log(error);
-    toast({ description: 'Registration Failed' });
+    const errorMsg =
+      error instanceof AxiosError
+        ? error.response?.data.error.message
+        : 'Registration Failed';
+    toast({ description: errorMsg });
+
     return null;
   }
 };
@@ -29,13 +35,13 @@ function Register() {
           <CardTitle className='text-center'>Register</CardTitle>
         </CardHeader>
         <CardContent>
-          <Form method='POST'>
+          <Form method='post'>
             <FormInput type='text' name='username' />
             <FormInput type='email' name='email' />
             <FormInput type='password' name='password' />
-            <SubmitBtn text='Register' />
+            <SubmitBtn text='Register' className='w-full mt-4' />
             <p className='text-center mt-4'>
-              Already a member?
+              Already a member?{' '}
               <Button type='button' asChild variant='link'>
                 <Link to='/login'>Login</Link>
               </Button>

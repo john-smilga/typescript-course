@@ -1,5 +1,6 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { applyTheme } from '@/utils';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+
 export type Theme = 'dark' | 'light' | 'system';
 
 type ThemeState = {
@@ -15,7 +16,6 @@ const initializeTheme = (): Theme => {
 const initialState: ThemeState = {
   theme: initializeTheme(),
 };
-
 const themeSlice = createSlice({
   name: 'theme',
   initialState,

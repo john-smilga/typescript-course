@@ -19,7 +19,6 @@ const getUserFromLocalStorage = (): User | null => {
 const initialState: UserState = {
   user: getUserFromLocalStorage(),
 };
-
 const userSlice = createSlice({
   name: 'user',
   initialState,
@@ -28,7 +27,6 @@ const userSlice = createSlice({
       const user = action.payload;
       state.user = user;
       localStorage.setItem('user', JSON.stringify(user));
-
       if (user.username === 'demo user') {
         toast({ description: 'Welcome Guest User' });
         return;
@@ -37,7 +35,6 @@ const userSlice = createSlice({
     },
     logoutUser: (state) => {
       state.user = null;
-      // localStorage.clear()
       localStorage.removeItem('user');
     },
   },

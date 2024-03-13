@@ -29,9 +29,10 @@ function SelectProductAmount({
   setAmount,
 }: SelectProductAmountProps | SelectCartItemAmountProps) {
   const cartItem = mode === Mode.CartItem;
+
   return (
     <>
-      <h4 className='font-medium mb-2'>Amount :</h4>
+      <h4 className='font-medium mb-2'>Amount : </h4>
       <Select
         defaultValue={amount.toString()}
         onValueChange={(value) => setAmount(Number(value))}

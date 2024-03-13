@@ -1,3 +1,8 @@
+export type ProductsResponse = {
+  data: Product[];
+  meta: ProductsMeta;
+};
+
 export type Product = {
   id: number;
   attributes: {
@@ -29,16 +34,6 @@ export type Pagination = {
   total: number;
 };
 
-export type ProductsResponse = {
-  data: Product[];
-  meta: ProductsMeta;
-};
-
-export type SingleProductResponse = {
-  data: Product;
-  meta: {};
-};
-
 export type Params = {
   search?: string;
   category?: string;
@@ -50,6 +45,11 @@ export type Params = {
 };
 
 export type ProductsResponseWithParams = ProductsResponse & { params: Params };
+
+export type SingleProductResponse = {
+  data: Product;
+  meta: {};
+};
 
 export type CartItem = {
   cartID: string;
@@ -69,6 +69,15 @@ export type CartState = {
   shipping: number;
   tax: number;
   orderTotal: number;
+};
+
+export type Checkout = {
+  name: string;
+  address: string;
+  chargeTotal: number;
+  orderTotal: string;
+  cartItems: CartItem[];
+  numItemsInCart: number;
 };
 
 export type Order = {

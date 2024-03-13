@@ -4,40 +4,10 @@ import { Button } from './ui/button';
 import { editItem, removeItem } from '@/features/cart/cartSlice';
 import SelectProductAmount from './SelectProductAmount';
 import { Mode } from './SelectProductAmount';
-export const ThirdColumn = ({
-  amount,
-  cartID,
-}: {
-  amount: number;
-  cartID: string;
-}) => {
-  const dispatch = useAppDispatch();
-
-  const removeItemFromTheCart = () => {
-    dispatch(removeItem(cartID));
-  };
-
-  const setAmount = (value: number) => {
-    dispatch(editItem({ cartID, amount: value }));
-  };
-
-  return (
-    <div>
-      <SelectProductAmount
-        amount={amount}
-        setAmount={setAmount}
-        mode={Mode.CartItem}
-      />
-      <Button variant='link' className='-ml-4' onClick={removeItemFromTheCart}>
-        remove
-      </Button>
-    </div>
-  );
-};
 
 export const FirstColumn = ({
-  image,
   title,
+  image,
 }: {
   image: string;
   title: string;
@@ -50,7 +20,6 @@ export const FirstColumn = ({
     />
   );
 };
-
 export const SecondColumn = ({
   title,
   company,
@@ -65,13 +34,13 @@ export const SecondColumn = ({
       <h3 className='capitalize font-medium'>{title}</h3>
       <h4 className='mt-2 capitalize text-sm'>{company}</h4>
       <p className='mt-4 text-sm capitalize flex items-center gap-x-2'>
-        color :
+        color :{' '}
         <span
           style={{
             width: '15px',
             height: '15px',
             borderRadius: '50%',
-            backgroundColor: productColor,
+            background: productColor,
           }}
         ></span>
       </p>
@@ -79,6 +48,35 @@ export const SecondColumn = ({
   );
 };
 
+export const ThirdColumn = ({
+  amount,
+  cartID,
+}: {
+  amount: number;
+  cartID: string;
+}) => {
+  const dispatch = useAppDispatch();
+
+  const removeItemFromCart = () => {
+    dispatch(removeItem(cartID));
+  };
+
+  const setAmount = (value: number) => {
+    dispatch(editItem({ cartID, amount: value }));
+  };
+  return (
+    <div>
+      <SelectProductAmount
+        amount={amount}
+        setAmount={setAmount}
+        mode={Mode.CartItem}
+      />
+      <Button variant='link' className='-ml-4' onClick={removeItemFromCart}>
+        remove
+      </Button>
+    </div>
+  );
+};
 export const FourthColumn = ({ price }: { price: string }) => {
   return <p className='font-medium sm:ml-auto'>{formatAsDollars(price)}</p>;
 };

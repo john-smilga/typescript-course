@@ -8,6 +8,7 @@ import {
 } from '@/components';
 import { ReduxStore } from '@/store';
 import { type OrdersResponse } from '@/utils';
+
 export const loader =
   (store: ReduxStore): LoaderFunction =>
   async ({ request }): Promise<OrdersResponse | Response | null> => {
@@ -20,7 +21,6 @@ export const loader =
     const params = Object.fromEntries([
       ...new URL(request.url).searchParams.entries(),
     ]);
-
     try {
       const response = await customFetch.get<OrdersResponse>('/orders', {
         params,
@@ -28,7 +28,6 @@ export const loader =
           Authorization: `Bearer ${user.jwt}`,
         },
       });
-
       return { ...response.data };
     } catch (error) {
       console.log(error);
@@ -36,11 +35,13 @@ export const loader =
       return null;
     }
   };
-const Orders = () => {
+
+function Orders() {
   const { meta } = useLoaderData() as OrdersResponse;
   if (meta.pagination.total < 1) {
     return <SectionTitle text='Please make an order' />;
   }
+
   return (
     <>
       <SectionTitle text='Your Orders' />
@@ -48,5 +49,5 @@ const Orders = () => {
       <ComplexPaginationContainer />
     </>
   );
-};
+}
 export default Orders;

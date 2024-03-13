@@ -15,12 +15,14 @@ export const loader: LoaderFunction = async ({
     ...new URL(request.url).searchParams.entries(),
   ]);
 
-  const response = await customFetch<ProductsResponse>(url, { params });
+  const response = await customFetch<ProductsResponse>(url, {
+    params,
+  });
 
   return { ...response.data, params };
 };
 
-const Products = () => {
+function Products() {
   return (
     <>
       <Filters />
@@ -28,5 +30,5 @@ const Products = () => {
       <PaginationContainer />
     </>
   );
-};
+}
 export default Products;

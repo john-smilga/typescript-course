@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { type CartItem, type CartState } from '@/utils';
 import { toast } from '@/components/ui/use-toast';
+
 const defaultState: CartState = {
   cartItems: [],
   numItemsInCart: 0,
@@ -29,9 +30,10 @@ const cartSlice = createSlice({
       }
       state.numItemsInCart += newCartItem.amount;
       state.cartTotal += Number(newCartItem.price) * newCartItem.amount;
-      state.tax = 0.1 * state.cartTotal;
-      state.orderTotal = state.cartTotal + state.shipping + state.tax;
-      localStorage.setItem('cart', JSON.stringify(state));
+      // state.tax = 0.1 * state.cartTotal;
+      // state.orderTotal = state.cartTotal + state.shipping + state.tax;
+      // localStorage.setItem('cart', JSON.stringify(state));
+      cartSlice.caseReducers.calculateTotals(state);
       toast({ description: 'Item added to cart' });
     },
     clearCart: () => {
@@ -59,8 +61,9 @@ const cartSlice = createSlice({
       state.numItemsInCart += amount - cartItem.amount;
       state.cartTotal += Number(cartItem.price) * (amount - cartItem.amount);
       cartItem.amount = amount;
+
       cartSlice.caseReducers.calculateTotals(state);
-      toast({ description: 'Amount updated' });
+      toast({ description: 'Amount Updated' });
     },
     calculateTotals: (state) => {
       state.tax = 0.1 * state.cartTotal;
@@ -71,4 +74,5 @@ const cartSlice = createSlice({
 });
 
 export const { addItem, clearCart, removeItem, editItem } = cartSlice.actions;
+
 export default cartSlice.reducer;

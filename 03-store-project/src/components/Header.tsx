@@ -6,23 +6,23 @@ import { logoutUser } from '../features/user/userSlice';
 import { clearCart } from '../features/cart/cartSlice';
 import { useToast } from './ui/use-toast';
 
-const Header = () => {
-  const dispatch = useAppDispatch();
+function Header() {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const { toast } = useToast();
-  const user = useAppSelector((state) => state.userState.user);
 
+  const user = useAppSelector((state) => state.userState.user);
   const handleLogout = () => {
-    navigate('/');
     dispatch(clearCart());
     dispatch(logoutUser());
-    toast({ description: 'Logged out' });
+    toast({ description: 'Logged Out' });
+    navigate('/');
   };
-
   return (
     <header>
-      <div className='align-element flex justify-center sm:justify-end py-2'>
+      <div className=' align-element flex justify-center sm:justify-end py-2'>
         {/* USER */}
+
         {user ? (
           <div className='flex gap-x-2 sm:gap-x-8 items-center'>
             <p className='text-xs sm:text-sm'>Hello, {user.username}</p>
@@ -35,6 +35,7 @@ const Header = () => {
             <Button asChild variant='link' size='sm'>
               <Link to='/login'>Sign in / Guest</Link>
             </Button>
+
             <Button asChild variant='link' size='sm'>
               <Link to='/register'>Register</Link>
             </Button>
@@ -43,5 +44,5 @@ const Header = () => {
       </div>
     </header>
   );
-};
+}
 export default Header;

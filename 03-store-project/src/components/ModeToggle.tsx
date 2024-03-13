@@ -8,7 +8,6 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { setTheme } from '@/features/theme/themeSlice';
-
 function ModeToggle() {
   const dispatch = useAppDispatch();
 
@@ -35,5 +34,4 @@ function ModeToggle() {
     </DropdownMenu>
   );
 }
-
 export default ModeToggle;

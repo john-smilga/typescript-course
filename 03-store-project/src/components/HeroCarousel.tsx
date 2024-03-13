@@ -19,19 +19,21 @@ function HeroCarousel() {
     <div className='hidden lg:block'>
       <Carousel>
         <CarouselContent>
-          {carouselImages.map((image, index) => (
-            <CarouselItem key={index}>
-              <Card>
-                <CardContent className='p-2'>
-                  <img
-                    src={image}
-                    alt='hero'
-                    className='w-full h-[24rem]  rounded-md object-cover'
-                  />
-                </CardContent>
-              </Card>
-            </CarouselItem>
-          ))}
+          {carouselImages.map((image, index) => {
+            return (
+              <CarouselItem key={index}>
+                <Card>
+                  <CardContent className='p-2'>
+                    <img
+                      src={image}
+                      alt='hero'
+                      className='w-full h-[24rem] rounded-md object-cover'
+                    />
+                  </CardContent>
+                </Card>
+              </CarouselItem>
+            );
+          })}
         </CarouselContent>
         <CarouselPrevious />
         <CarouselNext />

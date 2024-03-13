@@ -3,6 +3,7 @@ import { useState } from 'react';
 
 import { Label } from '@/components/ui/label';
 import { Slider } from './ui/slider';
+
 type FormRangeProps = {
   name: string;
   label?: string;

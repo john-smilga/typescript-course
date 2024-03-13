@@ -12,17 +12,17 @@ import { useAppSelector } from '@/hooks';
 
 function LinksDropdown() {
   const user = useAppSelector((state) => state.userState.user);
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild className='lg:hidden'>
         <Button variant='outline' size='icon'>
           <AlignLeft />
-
-          <span className='sr-only'>Toggle links</span>
+          <span className='sr-only'> Toggle Links</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
-        className='w-52 lg:hidden '
+        className='w-52 lg:hidden'
         align='start'
         sideOffset={25}
       >

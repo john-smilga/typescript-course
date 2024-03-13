@@ -1,10 +1,6 @@
-import CartButton from './CartButton';
-import LinksDropdown from './LinksDropdown';
-import Logo from './Logo';
-import ModeToggle from './ModeToggle';
-import NavLinks from './NavLinks';
+import { CartButton, LinksDropdown, Logo, ModeToggle, NavLinks } from '.';
 
-const Navbar = () => {
+function Navbar() {
   return (
     <nav className='bg-muted py-4'>
       <div className='align-element flex justify-between items-center'>
@@ -18,5 +14,5 @@ const Navbar = () => {
       </div>
     </nav>
   );
-};
+}
 export default Navbar;

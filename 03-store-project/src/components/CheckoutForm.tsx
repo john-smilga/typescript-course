@@ -1,31 +1,32 @@
 import { ActionFunction, Form, redirect } from 'react-router-dom';
 import FormInput from './FormInput';
 import SubmitBtn from './SubmitBtn';
-import { customFetch, formatAsDollars } from '@/utils';
+import { customFetch, formatAsDollars, type Checkout } from '@/utils';
 import { toast } from '@/components/ui/use-toast';
 import { clearCart } from '../features/cart/cartSlice';
 import { ReduxStore } from '@/store';
 
 export const action =
   (store: ReduxStore): ActionFunction =>
-  async ({ request }) => {
+  async ({ request }): Promise<null | Response> => {
     const formData = await request.formData();
-    const { name, address } = Object.fromEntries(formData);
+    const name = formData.get('name') as string;
+    const address = formData.get('address') as string;
 
     if (!name || !address) {
       toast({ description: 'please fill out all fields' });
       return null;
     }
-
     const user = store.getState().userState.user;
     if (!user) {
       toast({ description: 'please login to place an order' });
       return redirect('/login');
     }
+
     const { cartItems, orderTotal, numItemsInCart } =
       store.getState().cartState;
 
-    const info = {
+    const info: Checkout = {
       name,
       address,
       chargeTotal: orderTotal,
@@ -33,6 +34,7 @@ export const action =
       cartItems,
       numItemsInCart,
     };
+
     try {
       await customFetch.post(
         '/orders',
@@ -52,16 +54,15 @@ export const action =
       return null;
     }
   };
-const CheckoutForm = () => {
+
+function CheckoutForm() {
   return (
-    <Form method='POST' className='flex flex-col gap-y-4'>
+    <Form method='post' className='flex flex-col gap-y-4'>
       <h4 className='font-medium text-xl mb-4'>Shipping Information</h4>
       <FormInput label='first name' name='name' type='text' />
       <FormInput label='address' name='address' type='text' />
-      <div className='mt-4'>
-        <SubmitBtn text='Place Your Order' />
-      </div>
+      <SubmitBtn text='Place Your Oder' className=' mt-4' />
     </Form>
   );
-};
+}
 export default CheckoutForm;
