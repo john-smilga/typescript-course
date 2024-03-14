@@ -61,7 +61,7 @@ function CheckoutForm() {
       <h4 className='font-medium text-xl mb-4'>Shipping Information</h4>
       <FormInput label='first name' name='name' type='text' />
       <FormInput label='address' name='address' type='text' />
-      <SubmitBtn text='Place Your Oder' className=' mt-4' />
+      <SubmitBtn text='Place Your Order' className=' mt-4' />
     </Form>
   );
 }
