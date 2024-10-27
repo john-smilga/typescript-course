@@ -7,7 +7,7 @@ import { toast } from '@/components/ui/use-toast';
 import { AxiosError } from 'axios';
 
 export const action: ActionFunction = async ({
-  request,
+  request
 }): Promise<Response | null> => {
   const formData = await request.formData();
   const data = Object.fromEntries(formData);
