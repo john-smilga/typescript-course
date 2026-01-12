@@ -1082,6 +1082,11 @@ enum ServerResponseStatus {
   Error = 'Error',
 }
 
+interface ServerResponse {
+  result: ServerResponseStatus;
+  data: string[];
+}
+
 function getServerResponse(): ServerResponse {
   return {
     // result: ServerResponseStatus.Success,
